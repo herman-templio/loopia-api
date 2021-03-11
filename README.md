@@ -14,6 +14,8 @@ Uses the following environment variables, if they exist:
 - LOOPIA_PW - set to the api password
 - LOOPIA_DEBUG - set to enable debugging printout
 
+Can be set in a .env file.
+
 ## TODO
 
 - createNewAccount
