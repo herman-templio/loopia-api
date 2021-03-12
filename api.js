@@ -1,8 +1,14 @@
-const debug=require('debug')('loopia')
+let debug
+try {
+    // might not be installed
+    debug=require('debug')('loopia')
+} catch(e) {
+    debug = function() {}
+}
 let dotenv=require('dotenv').config()
 
 if(process.env.LOOPIA_DEBUG_ENABLED) {
-    require('debug').enable('loopia')
+    try { require('debug').enable('loopia') } catch(e) {}
 }
 
 let server_url='https://api.loopia.se/RPCSERV'

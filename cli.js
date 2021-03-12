@@ -1,4 +1,10 @@
-const debug=require('debug')('loopia')
+let debug
+try {
+    // might not be installed
+    debug=require('debug')('loopia')
+} catch(e) {
+    debug = function() {}
+}
 const { Command } = require('commander');
 const program = new Command()
 const api=require('./api')
@@ -13,7 +19,7 @@ program.option('--password <p>',"Use given")
 
 async function call(fun) {
     let opts=program.opts()
-    if(opts.debug) require('debug').enable('loopia')
+    try { if(opts.debug) require('debug').enable('loopia') } catch (e) {}
     try{
         let res=await fun(opts.subuser,opts.user,opts.password);
         console.log(res);
@@ -27,7 +33,7 @@ program.command('addDomain <domain>')
         call(async (subuser,user,password) => { return api.addDomain(domain,subuser,user,password) })
     })
 //
-program.command('addZoneRecord <domain>> <data>')
+program.command('addZoneRecord <domain> <data>')
     .option('--sub-domain <sub>','',)
     .option('--type <t>','record type (default A)','A')
     .option('--ttl <t>','TTL (default 300)',300)
@@ -150,6 +156,30 @@ program.command('updateZoneRecord <domain> <id> <data>')
 program.command('getCustomers')
     .action(async function(options) {
         call(async (subuser,user,password) => { return api.getCustomers(user,password) })
+    })
+
+
+//
+program.command('docGen')
+    .description('Generate doc in markup format')
+    .action(async function(){
+        let CommandDocument = require( "@mitsuru793/commander-document-generator" ).CommandDocument
+        const template = `
+{{#commands}}
+### {{name}} {{{args.0.display}}}
+
+{{description}}
+
+{{#options}}
+#### {{{flags}}}
+
+{{description}}
+{{/options}}
+{{/commands}}
+`
+
+        const doc = CommandDocument.parse(program)
+        console.log(doc.render(template))
     })
 
 program.parseAsync(process.argv)
