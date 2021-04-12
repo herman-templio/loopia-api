@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 let debug
 try {
     // might not be installed
